@@ -39,3 +39,17 @@ THen, run:
 # Verify on Etherscan
 
 Get the etherscan API key and put it in the `.env` file. The token will be automatically verified by running the deployment scripts.
+
+# Testing
+
+To test the smart contract, run:
+
+`yarn hardhat test`
+
+The gas price report will be automatically generated and saved in `gas-report.txt`.
+
+# Coverage
+
+This will show how many codes have been covered by the tests. Run:
+
+`yarn hardhat coverage`
