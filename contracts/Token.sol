@@ -75,10 +75,8 @@ contract TokenERC20 {
 
   function transfer(uint256 _value, address _to)
     public
-    returns (
-      /**onlyUnlockedAddressAllowed(msg.sender)*/
-      bool success
-    )
+    onlyUnlockedAddressAllowed(msg.sender)
+    returns (bool success)
   {
     _transfer(_value, msg.sender, _to);
     return true;
@@ -93,8 +91,8 @@ contract TokenERC20 {
   function transferFrom(
     uint256 _value,
     address _from,
-    address _to /**onlyUnlockedAddressAllowed(_from)*/
-  ) public returns (bool success) {
+    address _to
+  ) public onlyUnlockedAddressAllowed(_from) returns (bool success) {
     if (allowance[_from][msg.sender] < _value)
       revert TokenERC20__NotEnoughAllowance(
         allowance[_from][msg.sender],
