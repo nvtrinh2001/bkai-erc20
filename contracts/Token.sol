@@ -9,6 +9,7 @@ error TokenERC20__NotEnoughAllowance(
 );
 error TokenERC20__ZeroAddressNotAllowed();
 error TokenERC20__NotOwner(address actualUser);
+error TokenERC20__LockedAddress(address lockedAddress);
 
 contract TokenERC20 {
   // public variables will auto-generate getter functions
@@ -20,6 +21,7 @@ contract TokenERC20 {
 
   mapping(address => uint256) public balanceOf;
   mapping(address => mapping(address => uint256)) public allowance;
+  mapping(address => bool) public lockingState;
 
   event Transfer(uint256 value, address indexed from, address indexed to);
   event Approval(uint256 value, address indexed from, address indexed to);
@@ -43,6 +45,20 @@ contract TokenERC20 {
     _;
   }
 
+  modifier onlyUnlockedAddressAllowed(address _from) {
+    if (lockingState[_from]) revert TokenERC20__LockedAddress(_from);
+    _;
+  }
+
+  function lockAccount(address _account)
+    public
+    onlyOwner
+    returns (bool success)
+  {
+    lockingState[_account] = true;
+    return true;
+  }
+
   function _transfer(
     uint256 _value,
     address _from,
@@ -57,7 +73,13 @@ contract TokenERC20 {
     emit Transfer(_value, _from, _to);
   }
 
-  function transfer(uint256 _value, address _to) public returns (bool success) {
+  function transfer(uint256 _value, address _to)
+    public
+    returns (
+      /**onlyUnlockedAddressAllowed(msg.sender)*/
+      bool success
+    )
+  {
     _transfer(_value, msg.sender, _to);
     return true;
   }
@@ -71,7 +93,7 @@ contract TokenERC20 {
   function transferFrom(
     uint256 _value,
     address _from,
-    address _to
+    address _to /**onlyUnlockedAddressAllowed(_from)*/
   ) public returns (bool success) {
     if (allowance[_from][msg.sender] < _value)
       revert TokenERC20__NotEnoughAllowance(
