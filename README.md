@@ -32,7 +32,7 @@ yarn
 
 Set up the environment variables as in the `.env.example` file.
 
-THen, run:
+Then, run:
 
 `yarn hardhat deploy --network rinkeby`
 
